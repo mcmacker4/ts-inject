@@ -6,10 +6,12 @@
         "module": "commonjs",
         "strictNullChecks": true,
         "declaration": true,
-        "declarationDir": "types"
+        "declarationDir": "types",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "exclude": [
-        "node_modules"
+        "node_modules", "test"
     ],
     "include": [
         "src"

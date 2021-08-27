@@ -5,7 +5,7 @@ export type AbstractClass<T = any> = Function & { prototype: T }
 export type ArgsBuilder = () => any[]
 
 export interface Dependency<T = any> {
-    constr: Class<T>,
+    constr: Class<T>
     args?: any[] | ArgsBuilder
 }
 
