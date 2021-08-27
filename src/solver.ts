@@ -1,5 +1,5 @@
 import {ArgsBuilder, Class, debug} from "./util";
-import {findComponent} from "./tree";
+import {findComponent} from "./deps";
 
 interface InjectedProp {
     className: string

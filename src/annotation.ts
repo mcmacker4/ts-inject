@@ -1,6 +1,6 @@
 import "reflect-metadata"
 
-import {registerComponent} from "./tree";
+import {registerComponent} from "./deps";
 import {registerInjectedProperty} from "./solver";
 import {debug} from "./util";
 
