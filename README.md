@@ -17,7 +17,7 @@ Dependency lifetime is not managed (yet?)
 
 ## Example
 ```ts
-import { Inject, configureDI, construct } from 'ts-inject'
+import { Inject, configureDI, createInstance } from 'ts-inject'
 
 abstract class IController {
     abstract getPerson(name: string): { name: string }
@@ -47,8 +47,8 @@ configureDI(register => {
 })
 
 // To construct a class that needs dependency injection (has a property marked with @Inject)
-// you need to construct it using the `construct()` function
-const dependant = construct(Dependant)
+// you need to construct it using the `createInstance()` function
+const dependant = createInstance(Dependant)
 
 dependant.printPerson("Michael")
 
