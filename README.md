@@ -2,7 +2,7 @@
 ### Decorator based dependency injection for typescript.
 
 ```
-npm install ts-node
+npm install @mcmacker4/tsinject
 ```
 
 ## Preparation
@@ -17,14 +17,12 @@ Dependency lifetime is not managed (yet?)
 
 ## Example
 ```ts
-import { Inject, Component, construct } from 'ts-inject'
+import { Inject, configureDI, construct } from 'ts-inject'
 
 abstract class IController {
     abstract getPerson(name: string): { name: string }
 }
 
-// Mark a class to be injected with the @Component decorator
-@Component
 class Controller extends IController {
     getPerson(name: string): { name: string } {
         return { name }
@@ -43,9 +41,13 @@ class Dependant {
     }
 }
 
+// We need to manually configure Dependency Injection
+configureDI(register => {
+    register(IController, Controller)
+})
+
 // To construct a class that needs dependency injection (has a property marked with @Inject)
 // you need to construct it using the `construct()` function
-
 const dependant = construct(Dependant)
 
 dependant.printPerson("Michael")

@@ -1,12 +1,12 @@
 import "reflect-metadata"
 
-import {Constructor} from "./util";
 import {registerComponent} from "./tree";
 import {registerInjectedProperty} from "./solver";
 
+export type ConfiguratorFn = (register: typeof registerComponent) => void
 
-export function Component<T extends Constructor>(constructor: T) {
-    registerComponent(constructor)
+export function configureDI(callback: ConfiguratorFn) {
+    callback(registerComponent)
 }
 
 export function Inject<T>(target: any, propertyKey: string) {
