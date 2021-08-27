@@ -1,3 +1,3 @@
 
-export { configureDI, Inject } from './annotation'
+export { configureDI, Inject, InjectInstance } from './annotation'
 export { createInstance } from './solver'

@@ -42,8 +42,8 @@ class Dependant {
 }
 
 // We need to manually configure Dependency Injection
-configureDI(register => {
-    register(IController, Controller)
+configureDI(component => {
+    component(IController, Controller)
 })
 
 // To construct a class that needs dependency injection (has a property marked with @Inject)
