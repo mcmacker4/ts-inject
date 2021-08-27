@@ -1,0 +1,22 @@
+{
+  "name": "ts-inject",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "types/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "prepublish": "tsc"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/node": "^16.7.2",
+    "typescript": "^4.4.2"
+  },
+  "peerDependencies": {
+    "debug": "^4.3.2"
+  }
+}
