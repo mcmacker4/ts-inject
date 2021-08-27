@@ -1,4 +1,4 @@
-import {ArgsBuilder, Class, debug} from "./util";
+import {Class, debug, Lifetime} from "./util";
 import {findComponent, findInstance} from "./deps";
 
 interface InjectedProp {
@@ -43,8 +43,18 @@ function injectProps<T>(className: string, instance: any) {
         debug(`Found injected property ${prop.className}.${prop.propertyKey} of type ${prop.propertyType}`)
         const dependency = findComponent(prop.propertyType)
         if (dependency) {
-            const args = (dependency.args instanceof Function ? dependency.args() : dependency.args) || []
-            instance[prop.propertyKey] = createInstance(dependency.constr, args)
+            switch (dependency.lifetime) {
+                case Lifetime.SINGLETON: {
+                    if (!dependency.singleton)
+                        dependency.singleton = createInstance(dependency.constr, dependency.builder)
+                    instance[prop.propertyKey] = dependency.singleton
+                    break
+                }
+                case Lifetime.TRANSIENT: {
+                    instance[prop.propertyKey] = createInstance(dependency.constr, dependency.builder)
+                    break
+                }
+            }
         } else {
             throw new Error(`Did not find a suitable dependency for ${prop.className}.${prop.propertyKey}`)
         }
@@ -64,9 +74,9 @@ function injectInstanceProps(className: string, instance: any) {
     }
 }
 
-export function createInstance<T>(constructor: Class<T>, args: any[] | ArgsBuilder | undefined = undefined): T {
+export function createInstance<T>(constructor: Class<T>, builder?: () => T): T {
     debug(`Constructing new instance of type ${constructor.name}`)
-    const instance = new constructor(args instanceof Function ? args() : args)
+    const instance = builder ? builder() : new constructor()
     injectProps(constructor.name, instance)
     injectInstanceProps(constructor.name, instance)
     return instance

@@ -1,5 +1,4 @@
-import {Inject, createInstance, configureDI} from "../src"
-import {InjectInstance} from "../src/annotation";
+import {Inject, InjectInstance, createInstance, configureDI} from "../src"
 
 type Person = { name: string }
 

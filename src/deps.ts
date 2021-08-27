@@ -1,12 +1,17 @@
-import {AbstractClass, ArgsBuilder, Class, debug, Dependency} from "./util";
+import {AbstractClass, Class, debug, Dependency, Lifetime} from "./util";
 
 const dependencies = new Map<string, Dependency>()
 const instances = new Map<string, any>()
 
-export function registerComponent<A, C>(type: AbstractClass<A>, actual: Class<C>, args: any[] | ArgsBuilder | undefined = undefined) {
+export function registerComponent<A, C>(
+    type: AbstractClass<A>,
+    actual: Class<C>,
+    lifetime: Lifetime = Lifetime.SINGLETON,
+    builder?: () => C
+) {
     debug(`Registering component: ${type.name}`)
     if (!dependencies.has(type.name))
-        dependencies.set(type.name, { constr: actual, args })
+        dependencies.set(type.name, { constr: actual, lifetime, builder })
     else
         throw new Error(`A component for type ${type.name} has already been registered.`)
 }

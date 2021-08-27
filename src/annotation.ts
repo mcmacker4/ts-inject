@@ -4,6 +4,7 @@ import {registerComponent, registerInstance} from "./deps";
 import {registerInjectedInstanceProperty, registerInjectedProperty} from "./solver";
 import {debug} from "./util";
 
+
 export function configureDI(callback: (component: typeof registerComponent, instance: typeof registerInstance) => void) {
     callback(registerComponent, registerInstance)
 }
