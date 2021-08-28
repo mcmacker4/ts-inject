@@ -46,12 +46,12 @@ function injectProps<T>(className: string, instance: any) {
             switch (dependency.lifetime) {
                 case Lifetime.SINGLETON: {
                     if (!dependency.singleton)
-                        dependency.singleton = createInstance(dependency.constr, dependency.builder)
+                        dependency.singleton = getInstance(dependency.constr, dependency.builder)
                     instance[prop.propertyKey] = dependency.singleton
                     break
                 }
                 case Lifetime.TRANSIENT: {
-                    instance[prop.propertyKey] = createInstance(dependency.constr, dependency.builder)
+                    instance[prop.propertyKey] = getInstance(dependency.constr, dependency.builder)
                     break
                 }
             }
@@ -74,10 +74,20 @@ function injectInstanceProps(className: string, instance: any) {
     }
 }
 
-export function createInstance<T>(constructor: Class<T>, builder?: () => T): T {
+export function getInstance<T>(constructor: Class<T>, builder?: () => T): T {
     debug(`Constructing new instance of type ${constructor.name}`)
-    const instance = builder ? builder() : new constructor()
-    injectProps(constructor.name, instance)
-    injectInstanceProps(constructor.name, instance)
-    return instance
+    const dep = findComponent(constructor.name)
+    if (dep && dep.lifetime == Lifetime.SINGLETON) {
+        if (!dep.singleton) {
+            dep.singleton = builder ? builder() : new constructor()
+            injectProps(constructor.name, dep.singleton)
+            injectInstanceProps(constructor.name, dep.singleton)
+        }
+        return dep.singleton
+    } else {
+        const instance = builder ? builder() : new constructor()
+        injectProps(constructor.name, instance)
+        injectInstanceProps(constructor.name, instance)
+        return instance
+    }
 }

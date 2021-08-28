@@ -1,4 +1,4 @@
 
 export { configureDI, Inject, InjectInstance } from './annotation'
-export { createInstance } from './solver'
+export { getInstance } from './solver'
 export { Lifetime } from './util'

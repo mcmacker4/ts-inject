@@ -1,4 +1,4 @@
-import {Inject, InjectInstance, createInstance, configureDI} from "../src"
+import {Inject, InjectInstance, getInstance, configureDI} from "../src"
 
 type Person = { name: string }
 
@@ -42,7 +42,7 @@ describe("Injection", () => {
     })
 
     test("Everything?", () => {
-        const dep = createInstance(Dependant)
+        const dep = getInstance(Dependant)
         const name = "Test Name"
         expect(dep.getPerson(name)).toHaveProperty('name', `${name} ${surname}`)
     })

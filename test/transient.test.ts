@@ -1,4 +1,4 @@
-import {configureDI, createInstance, Inject, Lifetime} from "../src";
+import {configureDI, getInstance, Inject, Lifetime} from "../src";
 
 class Dependency {
     private readonly id = Math.floor(Math.random() * 999999)
@@ -24,8 +24,8 @@ describe('Transient lifetime', () => {
     })
 
     test('same value', () => {
-        const dep1 = createInstance(Dep1)
-        const dep2 = createInstance(Dep2)
+        const dep1 = getInstance(Dep1)
+        const dep2 = getInstance(Dep2)
 
         expect(dep1.value).not.toEqual(dep2.value)
     })
