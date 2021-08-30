@@ -12,12 +12,12 @@ export function configureDI(callback: (component: typeof registerComponent, inst
 export function Inject(target: any, propertyKey: string) {
     debug(`Called @Inject on ${target.constructor.name}.${propertyKey}`)
     const type = Reflect.getMetadata('design:type', target, propertyKey)
-    registerInjectedProperty(target.constructor.name, propertyKey, type.name)
+    registerInjectedProperty(target.constructor, propertyKey, type)
 }
 
 export function InjectInstance<T>(name: string) {
     return function(target: any, propertyKey: string) {
         debug(`Called @InjectInstance on ${target.constructor.name}.${propertyKey}`)
-        registerInjectedInstanceProperty(target.constructor.name, propertyKey, name)
+        registerInjectedInstanceProperty(target.constructor, propertyKey, name)
     }
 }

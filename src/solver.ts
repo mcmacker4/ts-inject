@@ -1,46 +1,44 @@
-import {Class, debug, Lifetime} from "./util";
+import {AbstractClass, Class, debug, Lifetime} from "./util";
 import {findComponent, findInstance} from "./deps";
 
-interface InjectedProp {
-    className: string
+interface InjectedProp<T = any> {
     propertyKey: string
-    propertyType: string
+    propertyType: AbstractClass<T>
 }
 
 interface InjectedInstanceProp {
-    className: string
     propertyKey: string
     instanceName: string
 }
 
-const injectedProps = new Map<string, InjectedProp[]>()
-const injectedInstanceProps = new Map<string, InjectedInstanceProp[]>()
+const injectedProps = new Map<Class, InjectedProp[]>()
+const injectedInstanceProps = new Map<Class, InjectedInstanceProp[]>()
 
-export function registerInjectedProperty(className: string, propertyKey: string, propertyType: string) {
-    debug(`Registering injected property ${className}.${propertyKey} of type ${propertyType}`)
-    if (injectedProps.has(className)) {
-        const props = injectedProps.get(className)!
-        props.push({ className, propertyKey, propertyType })
+export function registerInjectedProperty<T, P>(type: Class<T>, propertyKey: string, propertyType: Class<P>) {
+    debug(`Registering injected property ${type.name}.${propertyKey} of type ${propertyType}`)
+    if (injectedProps.has(type)) {
+        const props = injectedProps.get(type)!
+        props.push({ propertyKey, propertyType })
     } else {
-        injectedProps.set(className, [{ className, propertyKey, propertyType }])
+        injectedProps.set(type, [{ propertyKey, propertyType }])
     }
 }
 
-export function registerInjectedInstanceProperty(className: string, propertyKey: string, instanceName: string) {
-    debug(`Registering injected instance property ${className}.${propertyKey}`)
-    const injectedProp: InjectedInstanceProp = { className, propertyKey, instanceName}
-    if (injectedInstanceProps.has(className)) {
-        const props = injectedInstanceProps.get(className)!
+export function registerInjectedInstanceProperty(type: Class, propertyKey: string, instanceName: string) {
+    debug(`Registering injected instance property ${type.name}.${propertyKey}`)
+    const injectedProp: InjectedInstanceProp = { propertyKey, instanceName}
+    if (injectedInstanceProps.has(type)) {
+        const props = injectedInstanceProps.get(type)!
         props.push(injectedProp)
     } else {
-        injectedInstanceProps.set(className, [injectedProp])
+        injectedInstanceProps.set(type, [injectedProp])
     }
 }
 
-function injectProps<T>(className: string, instance: any) {
-    const props = injectedProps.get(className) || []
+function injectProps<T>(constructor: Class<T>, instance: any) {
+    const props = injectedProps.get(constructor) || []
     for (let prop of props) {
-        debug(`Found injected property ${prop.className}.${prop.propertyKey} of type ${prop.propertyType}`)
+        debug(`Found injected property ${constructor.name}.${prop.propertyKey} of type ${prop.propertyType}`)
         const dependency = findComponent(prop.propertyType)
         if (dependency) {
             switch (dependency.lifetime) {
@@ -56,15 +54,15 @@ function injectProps<T>(className: string, instance: any) {
                 }
             }
         } else {
-            throw new Error(`Did not find a suitable dependency for ${prop.className}.${prop.propertyKey}`)
+            throw new Error(`Did not find a suitable dependency for ${constructor.name}.${prop.propertyKey}`)
         }
     }
 }
 
-function injectInstanceProps(className: string, instance: any) {
-    const props = injectedInstanceProps.get(className) || []
+function injectInstanceProps<T, I>(constructor: Class<T>, instance: I) {
+    const props = injectedInstanceProps.get(constructor) || []
     for (let prop of props) {
-        debug(`Found injected instance property ${prop.className}.${prop.propertyKey} with key ${prop.instanceName}`)
+        debug(`Found injected instance property ${constructor.name}.${prop.propertyKey} with key ${prop.instanceName}`)
         const dependency = findInstance(prop.instanceName)
         if (dependency) {
             instance[prop.propertyKey] = dependency
@@ -76,18 +74,18 @@ function injectInstanceProps(className: string, instance: any) {
 
 export function getInstance<T>(constructor: Class<T>, builder?: () => T): T {
     debug(`Constructing new instance of type ${constructor.name}`)
-    const dep = findComponent(constructor.name)
+    const dep = findComponent(constructor)
     if (dep && dep.lifetime == Lifetime.SINGLETON) {
         if (!dep.singleton) {
             dep.singleton = builder ? builder() : new constructor()
-            injectProps(constructor.name, dep.singleton)
-            injectInstanceProps(constructor.name, dep.singleton)
+            injectProps(constructor, dep.singleton)
+            injectInstanceProps(constructor, dep.singleton)
         }
         return dep.singleton
     } else {
         const instance = builder ? builder() : new constructor()
-        injectProps(constructor.name, instance)
-        injectInstanceProps(constructor.name, instance)
+        injectProps(constructor, instance)
+        injectInstanceProps(constructor, instance)
         return instance
     }
 }

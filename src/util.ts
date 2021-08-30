@@ -14,6 +14,7 @@ export interface Dependency<T = any> {
     singleton?: T
 }
 
+// noinspection JSUnusedLocalSymbols
 export let debug = (format: any, ...args: any[]) => {}
 
 try {
