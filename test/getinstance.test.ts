@@ -1,4 +1,4 @@
-import {getInstance, configureDI} from "../src";
+import {configureDI, resolveDependency} from "../src";
 
 
 abstract class IDependency {
@@ -17,8 +17,8 @@ beforeAll(() => {
 
 
 test('singleton instance', () => {
-    const i1 = getInstance(IDependency)
-    const i2 = getInstance(IDependency)
+    const i1 = resolveDependency(IDependency)
+    const i2 = resolveDependency(IDependency)
 
     expect(i1).toEqual(i2)
     expect(i1.id).toEqual(i2.id)

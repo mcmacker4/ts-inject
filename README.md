@@ -13,7 +13,15 @@ in your `tsconfig.json`
 ## Example
 
 ```ts
-import {Inject, InjectInstance, Lifetime, configureDI, getInstance} from 'ts-inject'
+import {
+    Inject,
+    InjectInstance,
+    Lifetime,
+    configureDI,
+    getInstance,
+    resolveDependency,
+    resolveInstanceDependency,
+} from 'ts-inject'
 
 import {Pool, createPool} from 'mysql2/promise'
 
@@ -76,4 +84,10 @@ const dependant = getInstance(Dependant)
 
 dependant.printPerson("Michael")
 
+// To resolve an abstract class into a concrete instance you can use
+//   - resolveDependency(AbstractType) for component dependencies
+//   - resolveInstanceDependency("id") for instance dependencies
+const controller = resolveDependency(IController)
+
+expect(controller.getPerson("Person")).toHaveProperty("name", "Person")
 ```

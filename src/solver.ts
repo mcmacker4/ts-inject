@@ -45,12 +45,7 @@ export function injectProps<T>(type: Class<T>, instance: T) {
     const props = injectedProps.get(type) || []
     for (let prop of props) {
         debug(`Found injected property ${type.name}.${prop.propertyKey} of type ${prop.propertyType}`)
-        const dependency = findComponent(prop.propertyType)
-        if (dependency) {
-            instance[prop.propertyKey] = dependency.getInstance()
-        } else {
-            throw new Error(`Did not find a suitable dependency for ${type.name}.${prop.propertyKey}`)
-        }
+        instance[prop.propertyKey] = resolveDependency(prop.propertyType)
     }
 }
 
@@ -58,27 +53,45 @@ export function injectInstanceProps<T, I>(type: Class<T>, instance: I) {
     const props = injectedInstanceProps.get(type) || []
     for (let prop of props) {
         debug(`Found injected instance property ${type.name}.${prop.propertyKey} with key ${prop.instanceName}`)
-        const dependency = findInstance(prop.instanceName)
-        if (dependency) {
-            instance[prop.propertyKey] = dependency
-        } else {
-            throw new Error(`Could not find Instance Dependency with name ${prop.instanceName}`)
-        }
+        instance[prop.propertyKey] = resolveInstanceDependency(prop.instanceName)
     }
 }
 
-export function getInstance<T>(type: AbstractClass<T> | Class<T>, builder?: () => T): T {
-    debug(`Constructing a new instance of type ${type.name}`)
+/**
+ * Given an ID, returns the associated instance dependency
+ * (as configured with `configureDI`).
+ * @param name
+ */
+export function resolveInstanceDependency<T>(name: string): T {
+    const dependency = findInstance<T>(name)
+    if (!dependency)
+        throw new Error(`"${name}" is not a registered instance dependency`)
+    return dependency
+}
+
+/**
+ * Given an abstract type, returns an instance of its associated concrete type
+ * (as configured with `configureDI`).
+ * @param type
+ */
+export function resolveDependency<T>(type: AbstractClass<T>) {
     const dependency = findComponent<T>(type)
-    if (dependency) {
-        debug(`Dependency Found for ${type}: ${dependency.constr}`)
-        return dependency.getInstance()
-    } else {
-        debug(`No dependency found for ${type}. Creating new instance.`)
-        const constr = type as Class<T>
-        const instance = builder ? builder() : new constr()
-        injectProps(constr, instance)
-        injectInstanceProps(constr, instance)
-        return instance
-    }
+    if (!dependency)
+        throw new Error(`${type} is not a registered dependency.`)
+    debug(`Dependency Found for ${type}: ${dependency.constr}`)
+    return dependency.getInstance()
+}
+
+/**
+ * Given a class, creates a new instance of the class (using `builder` if provided)
+ * and injects all dependencies marked with `@Inject` or `@InjectInstance(id)`.
+ * @param type
+ * @param builder
+ */
+export function getInstance<T>(type: Class<T>, builder?: () => T): T {
+    debug(`Constructing a new instance of type ${type.name}`)
+    const instance = builder ? builder() : new type()
+    injectProps(type, instance)
+    injectInstanceProps(type, instance)
+    return instance
 }

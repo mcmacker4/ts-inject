@@ -33,6 +33,6 @@ export function findComponent<T>(type: AbstractClass<T>): Dependency | undefined
     return dependencies.get(type)
 }
 
-export function findInstance<T>(name: string): any {
+export function findInstance<T>(name: string): T {
     return instances.get(name)
 }
