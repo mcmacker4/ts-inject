@@ -21,7 +21,7 @@ const injectedProps = new Map<Class, InjectedProp[]>()
 const injectedInstanceProps = new Map<Class, InjectedInstanceProp[]>()
 
 export function registerInjectedProperty<T, P>(type: Class<T>, propertyKey: string, propertyType: Class<P>) {
-    debug(`Registering injected property ${type.name}.${propertyKey} of type ${propertyType}`)
+    debug(`Registering injected property ${type.name}.${propertyKey} of type ${propertyType.name}`)
     if (injectedProps.has(type)) {
         const props = injectedProps.get(type)!
         props.push({ propertyKey, propertyType })
@@ -44,7 +44,7 @@ export function registerInjectedInstanceProperty<T>(type: Class<T>, propertyKey:
 export function injectProps<T>(type: Class<T>, instance: T) {
     const props = injectedProps.get(type) || []
     for (let prop of props) {
-        debug(`Found injected property ${type.name}.${prop.propertyKey} of type ${prop.propertyType}`)
+        debug(`Found injected property ${type.name}.${prop.propertyKey} of type ${prop.propertyType.name}`)
         instance[prop.propertyKey] = resolveDependency(prop.propertyType)
     }
 }
@@ -77,8 +77,7 @@ export function resolveInstanceDependency<T>(name: string): T {
 export function resolveDependency<T>(type: AbstractClass<T>) {
     const dependency = findComponent<T>(type)
     if (!dependency)
-        throw new Error(`${type} is not a registered dependency.`)
-    debug(`Dependency Found for ${type}: ${dependency.constr}`)
+        throw new Error(`${type.name} is not a registered dependency.`)
     return dependency.getInstance()
 }
 
