@@ -13,7 +13,7 @@ in your `tsconfig.json`
 ## Example
 
 ```ts
-import {Inject, InjectInstance, Lifetime, configureDI, createInstance} from 'ts-inject'
+import {Inject, InjectInstance, Lifetime, configureDI, getInstance} from 'ts-inject'
 
 import {Pool, createPool} from 'mysql2/promise'
 
@@ -72,7 +72,7 @@ configureDI((component, instance) => {
 
 // To construct a class that needs dependency injection (has a property marked with @Inject)
 // you need to construct it using the `createInstance()` function
-const dependant = createInstance(Dependant)
+const dependant = getInstance(Dependant)
 
 dependant.printPerson("Michael")
 
